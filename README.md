@@ -1,16 +1,11 @@
-# it_book
+# IT Book
 
-A new Flutter project.
+A new Flutter project - IT Book .
 
-## Getting Started
+## Assignment
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Design and build an application built on the Flutter framework that, using the open API https://api.itbook.store/, will allow IT books to be searched. 
+The application will include a search box. 
+After entering and confirming the search term, a list of search results will be displayed. 
+After clicking on a list item, the detail of the book will be displayed. 
+Submit the entry in the form of a link to a git repository with the project source code.
