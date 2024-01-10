@@ -36,6 +36,7 @@ class SearchBookScreen extends StatefulWidget {
 class _SearchBookScreenState extends State<SearchBookScreen> {
   TextEditingController _searchInputController = TextEditingController();
   List<Book> _searchedBooks = [];
+  bool showFoundBooksText = false;
 
   @override
   Widget build(BuildContext context) {
@@ -53,8 +54,32 @@ class _SearchBookScreenState extends State<SearchBookScreen> {
           SearchBookButton(
             onButtonPressed: () {
               _searchBooks(_searchInputController.text);
+              showFoundBooksText = true;
             },
           ),
+          const SizedBox(height: 16), // Vzdialenosť medzi tlačidlom a textom
+          Visibility(
+            visible: showFoundBooksText && _searchedBooks.isNotEmpty,
+            child: Text(
+              'Found ${_searchedBooks.length} books:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Visibility(
+            visible: showFoundBooksText && _searchedBooks.isEmpty,
+            child: const Text(
+              'Found 0 books.',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Expanded(
+              child: SearchedBooksList(
+                searchResults: _searchedBooks,
+                onBookTap: (index) => {
+                  print("Index of clicked book: " + index.toString())
+                },
+              )
+          )
         ],
       ),
       backgroundColor: Colors.white,
@@ -119,5 +144,25 @@ class SearchBookButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(onPressed: onButtonPressed, child: Text('Search book'));
+  }
+}
+
+class SearchedBooksList extends StatelessWidget {
+  final List<Book> searchResults;
+  final Function(int) onBookTap;
+
+  SearchedBooksList({required this.searchResults, required this.onBookTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: searchResults.length,
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text(searchResults[index].title),
+          onTap: () => onBookTap(index),
+        );
+      },
+    );
   }
 }
