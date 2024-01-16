@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:it_book/screens/BookDataScreen.dart';
 
 import '../components/SearchBookButton.dart';
 import '../components/SearchBookTextInput.dart';
@@ -53,7 +54,11 @@ class _SearchBookScreenState extends State<SearchBookScreen> {
               child: SearchedBooksList(
                 searchResults: _searchedBooks,
                 onBookTap: (index) => {
-                  print("Index of clicked book: " + index.toString())
+                  print("Index of clicked book: " + index.toString()),
+                  Navigator.push(
+                      context, 
+                      MaterialPageRoute(builder: (context) => BookDataScreen(book: _searchedBooks[index]))
+                  )
                 },
               )
           )
@@ -88,6 +93,7 @@ class _SearchBookScreenState extends State<SearchBookScreen> {
       print('ISBN-13: ${_searchedBooks[i].isbn13}');
       print('Price: ${_searchedBooks[i].price}');
       print('Image: ${_searchedBooks[i].image}');
+      print('Url: ${_searchedBooks[i].url}');
       print('\n');
     }
   }
