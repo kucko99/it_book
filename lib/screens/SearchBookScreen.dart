@@ -21,6 +21,8 @@ class SearchBookScreen extends StatefulWidget {
 class _SearchBookScreenState extends State<SearchBookScreen> {
   TextEditingController _searchInputController = TextEditingController();
   List<Book> _searchedBooks = [];
+  int _numOfSearchedBooks = 0;
+  int _currentPage = 1;
   bool showFoundBooksText = false;
 
   @override
@@ -46,8 +48,8 @@ class _SearchBookScreenState extends State<SearchBookScreen> {
           Visibility(
             visible: showFoundBooksText,
             child: Text(
-              'Found ${_searchedBooks.length} book${_searchedBooks.length != 1 ? 's' : ''}.',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              'Found $_numOfSearchedBooks book${_numOfSearchedBooks != 1 ? 's' : ''}.',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           Expanded(
@@ -61,25 +63,52 @@ class _SearchBookScreenState extends State<SearchBookScreen> {
                   )
                 },
               )
-          )
+          ),
+          Visibility(
+            visible: showFoundBooksText,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: _currentPage > 1 ? () => _changePage(-1) : null,
+                  child: const Text('Previous Page'),
+                ),
+                const SizedBox(width: 16),
+                ElevatedButton(
+                  onPressed: () => _changePage(1),
+                  child: const Text('Next Page'),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
       backgroundColor: Colors.white,
     );
   }
 
-  Future<void> _searchBooks(String query) async {
-    final response = await http.get(Uri.parse('https://api.itbook.store/1.0/search/$query'));
+  Future<void> _searchBooks(String query, {int page = 1}) async {
+    final response = await http.get(
+      Uri.parse('https://api.itbook.store/1.0/search/$query/$page'),
+    );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       setState(() {
+        _numOfSearchedBooks = int.parse(data['total']);
         _searchedBooks = (data['books'] as List).map((book) => Book.fromJson(book)).toList();
         printInfoAboutBooksList(_searchedBooks);
       });
     } else {
       throw Exception('Failed to load books.');
     }
+  }
+
+  void _changePage(int increment) {
+    setState(() {
+      _currentPage += increment;
+      _searchBooks(_searchInputController.text, page: _currentPage);
+    });
   }
 
   void printInfoAboutBooksList(List<Book> result) {

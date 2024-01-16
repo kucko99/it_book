@@ -7,6 +7,6 @@ class SearchBookButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(onPressed: onButtonPressed, child: Text('Search book'));
+    return ElevatedButton(onPressed: onButtonPressed, child: const Text('Search book'));
   }
 }
