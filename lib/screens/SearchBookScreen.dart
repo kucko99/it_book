@@ -4,9 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:it_book/screens/BookDataScreen.dart';
 
-import '../components/SearchBookButton.dart';
-import '../components/SearchBookTextInput.dart';
-import '../components/SearchedBooksList.dart';
 import '../models/Book.dart';
 
 class SearchBookScreen extends StatefulWidget {
@@ -37,12 +34,22 @@ class _SearchBookScreenState extends State<SearchBookScreen> {
       ),
       body: Column(
         children: [
-          SearchBookTextInput(controller: _searchInputController),
-          SearchBookButton(
-            onButtonPressed: () {
-              _searchBooks(_searchInputController.text);
-              showFoundBooksText = true;
-            },
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+            child: TextField(
+              controller: _searchInputController,
+              decoration: const InputDecoration(
+                  labelText: 'Enter name of search book',
+                  contentPadding: EdgeInsets.only(top: 5)
+              ),
+            ),
+          ),
+          ElevatedButton(
+              onPressed: () {
+                _searchBooks(_searchInputController.text);
+                showFoundBooksText = true;
+              },
+              child: const Text('Search book')
           ),
           const SizedBox(height: 16),
           Visibility(
@@ -53,14 +60,19 @@ class _SearchBookScreenState extends State<SearchBookScreen> {
             ),
           ),
           Expanded(
-              child: SearchedBooksList(
-                searchResults: _searchedBooks,
-                onBookTap: (index) => {
-                  print("Index of clicked book: " + index.toString()),
-                  Navigator.push(
-                      context, 
-                      MaterialPageRoute(builder: (context) => BookDataScreen(book: _searchedBooks[index]))
-                  )
+              child: ListView.builder(
+                itemCount: _searchedBooks.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(_searchedBooks[index].title),
+                    onTap: () => {
+                      print("Index of clicked book: " + index.toString()),
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => BookDataScreen(book: _searchedBooks[index]))
+                      )
+                    },
+                  );
                 },
               )
           ),
