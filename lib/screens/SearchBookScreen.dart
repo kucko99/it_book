@@ -66,11 +66,8 @@ class _SearchBookScreenState extends State<SearchBookScreen> {
                     title: Text(_searchedBooks[index].title),
                     onTap: () => {
                       print("Index of clicked book: " + index.toString()),
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => BookDataScreen(book: _searchedBooks[index]))
-                      )
-                    },
+                      Navigator.pushNamed(context, '/bookDetail', arguments: _searchedBooks[index])
+                  },
                   );
                 },
               )

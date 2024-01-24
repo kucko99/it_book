@@ -5,9 +5,9 @@ import 'package:url_launcher/url_launcher_string.dart';
 import '../models/Book.dart';
 
 class BookDataScreen extends StatelessWidget {
-  final Book book;
+  final Book? book;
 
-  BookDataScreen({required this.book});
+  const BookDataScreen({required this.book});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class BookDataScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Image.network(book.image),
+            Image.network(book!.image),
             const SizedBox(height: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,7 +35,7 @@ class BookDataScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               Text(
-                book.title,
+                book!.title,
                 style: const TextStyle(fontSize: 18),
               ),
               const SizedBox(height: 8),
@@ -44,7 +44,7 @@ class BookDataScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               Text(
-                book.subtitle,
+                book!.subtitle,
                 style: const TextStyle(fontSize: 18),
               ),
               const SizedBox(height: 8),
@@ -53,7 +53,7 @@ class BookDataScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               Text(
-                book.isbn13,
+                book!.isbn13,
                 style: const TextStyle(fontSize: 18),
               ),
               const SizedBox(height: 8),
@@ -62,7 +62,7 @@ class BookDataScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               Text(
-                book.price,
+                book!.price,
                 style: const TextStyle(fontSize: 18),
               ),
               const SizedBox(height: 8),
@@ -74,14 +74,14 @@ class BookDataScreen extends StatelessWidget {
                 text: TextSpan(
                   children: <TextSpan>[
                     TextSpan(
-                      text: book.url,
+                      text: book!.url,
                       style: const TextStyle(
                         color: Colors.blue,
                         fontSize: 18,
                         decoration: TextDecoration.underline,
                       ),
                       recognizer: TapGestureRecognizer()
-                        ..onTap = () => launchUrlString(book.url),
+                        ..onTap = () => launchUrlString(book!.url),
                     ),
                   ],
                 ),

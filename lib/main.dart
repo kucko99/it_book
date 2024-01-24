@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:it_book/models/Book.dart';
+import 'package:it_book/screens/BookDataScreen.dart';
 import 'package:it_book/screens/SearchBookScreen.dart';
 
 void main() {
@@ -15,7 +17,11 @@ class ITBookApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.brown
       ),
-      home: const SearchBookScreen(title: 'IT Book Search'),
+      initialRoute: '/search',
+      routes: {
+        '/search': (context) => const SearchBookScreen(title: 'IT Book Search'),
+        '/bookDetail': (context) => BookDataScreen(book: ModalRoute.of(context)!.settings.arguments as Book),
+      },
     );
   }
 }
