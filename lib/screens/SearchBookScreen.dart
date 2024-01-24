@@ -1,8 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:it_book/screens/BookDataScreen.dart';
+import 'package:it_book/service/SearchBookAPI.dart';
 
 import '../models/Book.dart';
 
@@ -16,7 +14,8 @@ class SearchBookScreen extends StatefulWidget {
 }
 
 class _SearchBookScreenState extends State<SearchBookScreen> {
-  TextEditingController _searchInputController = TextEditingController();
+  final TextEditingController _searchInputController = TextEditingController();
+  final SearchBookAPI _searchBookAPI = SearchBookAPI();
   List<Book> _searchedBooks = [];
   int _numOfSearchedBooks = 0;
   int _currentPage = 1;
@@ -100,19 +99,15 @@ class _SearchBookScreenState extends State<SearchBookScreen> {
   }
 
   Future<void> _searchBooks(String query, {int page = 1}) async {
-    final response = await http.get(
-      Uri.parse('https://api.itbook.store/1.0/search/$query/$page'),
-    );
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+    try {
+      final data = await _searchBookAPI.searchBooks(query, page: page);
       setState(() {
         _numOfSearchedBooks = int.parse(data['total']);
-        _searchedBooks = (data['books'] as List).map((book) => Book.fromJson(book)).toList();
+        _searchedBooks = _searchBookAPI.parseBooks(data);
         printInfoAboutBooksList(_searchedBooks);
       });
-    } else {
-      throw Exception('Failed to load books.');
+    } catch (e) {
+      throw Exception('Failed to load books: $e');
     }
   }
 
