@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:it_book/screens/BookDataScreen.dart';
 import 'package:it_book/service/SearchBookAPI.dart';
-
 import '../models/Book.dart';
 
 class SearchBookScreen extends StatefulWidget {
-  const SearchBookScreen({super.key, required this.title});
+  const SearchBookScreen({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -20,6 +18,7 @@ class _SearchBookScreenState extends State<SearchBookScreen> {
   int _numOfSearchedBooks = 0;
   int _currentPage = 1;
   bool showFoundBooksText = false;
+  bool _loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -38,17 +37,17 @@ class _SearchBookScreenState extends State<SearchBookScreen> {
             child: TextField(
               controller: _searchInputController,
               decoration: const InputDecoration(
-                  labelText: 'Enter name of search book',
-                  contentPadding: EdgeInsets.only(top: 5)
+                labelText: 'Enter name of search book',
+                contentPadding: EdgeInsets.only(top: 5),
               ),
             ),
           ),
           ElevatedButton(
-              onPressed: () {
-                _searchBooks(_searchInputController.text);
-                showFoundBooksText = true;
-              },
-              child: const Text('Search book')
+            onPressed: () {
+              _searchBooks(_searchInputController.text);
+              showFoundBooksText = true;
+            },
+            child: const Text('Search book'),
           ),
           const SizedBox(height: 16),
           Visibility(
@@ -59,6 +58,15 @@ class _SearchBookScreenState extends State<SearchBookScreen> {
             ),
           ),
           Expanded(
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (ScrollNotification scrollInfo) {
+                if (!_loading &&
+                    scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+                  _loadMoreBooks();
+                  return true;
+                }
+                return false;
+              },
               child: ListView.builder(
                 itemCount: _searchedBooks.length,
                 itemBuilder: (context, index) {
@@ -67,26 +75,10 @@ class _SearchBookScreenState extends State<SearchBookScreen> {
                     onTap: () => {
                       print("Index of clicked book: " + index.toString()),
                       Navigator.pushNamed(context, '/bookDetail', arguments: _searchedBooks[index])
-                  },
+                    },
                   );
                 },
-              )
-          ),
-          Visibility(
-            visible: showFoundBooksText,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: _currentPage > 1 ? () => _changePage(-1) : null,
-                  child: const Text('Previous Page'),
-                ),
-                const SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: () => _changePage(1),
-                  child: const Text('Next Page'),
-                ),
-              ],
+              ),
             ),
           ),
         ],
@@ -97,7 +89,16 @@ class _SearchBookScreenState extends State<SearchBookScreen> {
 
   Future<void> _searchBooks(String query, {int page = 1}) async {
     try {
+      if (_loading) {
+        return;
+      }
+
+      setState(() {
+        _loading = true;
+      });
+
       final data = await _searchBookAPI.searchBooks(query, page: page);
+
       setState(() {
         _numOfSearchedBooks = int.parse(data['total']);
         _searchedBooks = _searchBookAPI.parseBooks(data);
@@ -105,22 +106,42 @@ class _SearchBookScreenState extends State<SearchBookScreen> {
       });
     } catch (e) {
       throw Exception('Failed to load books: $e');
+    } finally {
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
-  void _changePage(int increment) {
+  Future<void> _loadMoreBooks() async {
     setState(() {
-      _currentPage += increment;
-      _searchBooks(_searchInputController.text, page: _currentPage);
+      _loading = true;
     });
+
+    try {
+      final data = await _searchBookAPI.searchBooks(
+        _searchInputController.text,
+        page: _currentPage + 1,
+      );
+
+      setState(() {
+        _searchedBooks.addAll(_searchBookAPI.parseBooks(data));
+        _currentPage += 1;
+      });
+    } catch (e) {
+      print('Failed to load more books: $e');
+    } finally {
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 
   void printInfoAboutBooksList(List<Book> result) {
     print('Number of books: ${result.length}');
-    //print('List of books: $result');
 
     for (int i = 0; i < _searchedBooks.length; i++) {
-      print('Book ${i+1}:');
+      print('Book ${i + 1}:');
       print('Title: ${_searchedBooks[i].title}');
       print('Subtitle: ${_searchedBooks[i].subtitle}');
       print('ISBN-13: ${_searchedBooks[i].isbn13}');
